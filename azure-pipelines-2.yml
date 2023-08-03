@@ -1,0 +1,35 @@
+trigger:
+  branches:
+    include:
+      - master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: Docker@2
+  displayName: 'Build and push Docker image'
+  inputs:
+    command: 'buildAndPush'
+    containerRegistry: 'wazureacrregistry.azurecr.io' # Replace with the name of your ACR service connection
+    repository: 'php-web-app'
+    Dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
+
+- task: AzureCLI@2
+  displayName: 'Install kubectl'
+  inputs:
+    azureSubscription: '6c95dcf8-aea0-47cd-921c-637167627564' # Replace with the name of your Azure service connection
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      az aks install-cli
+
+- task: KubernetesManifest@0
+  displayName: 'Deploy to AKS'
+  inputs:
+    azureSubscription: '6c95dcf8-aea0-47cd-921c-637167627564' # Replace with the name of your Azure service connection
+    action: 'apply'
+    kubernetesServiceEndpoint: '6c95dcf8-aea0-47cd-921c-637167627564' # Replace with the name of your Azure service connection
+    namespace: 'default'
+    manifests: '$(Build.SourcesDirectory)/k8s.yml'
+
