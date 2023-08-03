@@ -1,0 +1,19 @@
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: hocinewalidtestingcode 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hocinewalidtestingcode
+  template:
+    metadata:
+      labels:
+        app: hocinewalidtestingcode 
+    spec:
+      containers:
+        - name: hocinewalidtestingcode 
+          image: wazureacrregistry.azurecr.io/hocinewalidtestingcode
+          ports:
+          - containerPort: 80
